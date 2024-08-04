@@ -49,6 +49,14 @@ export function App() {
     }
   }, [employees, employeesLoading, fetchAllEmployees, loadAllTransactions])
 
+  const updateTransactionApproval = useCallback(
+    (transactionId: string, newValue: boolean) => {
+      paginatedTransactionsUtils.updateTransaction?.(transactionId, newValue)
+      transactionsByEmployeeUtils.updateTransaction?.(transactionId, newValue)
+    },
+    [paginatedTransactionsUtils, transactionsByEmployeeUtils]
+  )
+
   return (
     <Fragment>
       <main className="MainContainer">
@@ -82,7 +90,7 @@ export function App() {
         <div className="RampBreak--l" />
 
         <div className="RampGrid">
-          <Transactions transactions={transactions} />
+          <Transactions transactions={transactions} onApprove={updateTransactionApproval} />
 
           {transactions !== null && paginatedTransactions?.nextPage && (
             <button

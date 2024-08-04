@@ -15,7 +15,7 @@ export const TransactionPane: TransactionPaneComponent = ({
         <p className="RampText">{transaction.merchant} </p>
         <b>{moneyFormatter.format(transaction.amount)}</b>
         <p className="RampText--hushed RampText--s">
-          {transaction.employee.firstName} {transaction.employee.lastName} - {transaction.date}
+          {transaction.employee.firstName} {transaction.employee.lastName} - {transaction.date} - {JSON.stringify(transaction.approved)}
         </p>
       </div>
       <InputCheckbox
