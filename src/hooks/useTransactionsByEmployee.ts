@@ -21,9 +21,18 @@ export function useTransactionsByEmployee(): TransactionsByEmployeeResult {
     [fetchWithCache]
   )
 
+  const updateTransaction = useCallback((transactionId: string, approved: boolean) => {
+    setTransactionsByEmployee(
+      (prevTransactions) =>
+        prevTransactions?.map((transaction) =>
+          transaction.id === transactionId ? { ...transaction, approved } : transaction
+        ) ?? null
+    )
+  }, [])
+
   const invalidateData = useCallback(() => {
     setTransactionsByEmployee(null)
   }, [])
 
-  return { data: transactionsByEmployee, loading, fetchById, invalidateData }
+  return { data: transactionsByEmployee, loading, fetchById, updateTransaction, invalidateData }
 }

@@ -29,9 +29,21 @@ export function usePaginatedTransactions(): PaginatedTransactionsResult {
     })
   }, [fetchWithCache, paginatedTransactions])
 
+  const updateTransaction = useCallback((transactionId: string, approved: boolean) => {
+    setPaginatedTransactions((prevState) => {
+      if (prevState === null) return null
+      return {
+        ...prevState,
+        data: prevState.data.map((transaction) =>
+          transaction.id === transactionId ? { ...transaction, approved } : transaction
+        ),
+      }
+    })
+  }, [])
+
   const invalidateData = useCallback(() => {
     setPaginatedTransactions(null)
   }, [])
 
-  return { data: paginatedTransactions, loading, fetchAll, invalidateData }
+  return { data: paginatedTransactions, loading, fetchAll, updateTransaction, invalidateData }
 }
