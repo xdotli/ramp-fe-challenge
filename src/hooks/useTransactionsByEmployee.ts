@@ -4,12 +4,12 @@ import { TransactionsByEmployeeResult } from "./types"
 import { useCustomFetch } from "./useCustomFetch"
 
 export function useTransactionsByEmployee(): TransactionsByEmployeeResult {
-  const { fetchWithoutCache, loading } = useCustomFetch()
+  const { fetchWithCache, clearCacheByEndpoint, loading } = useCustomFetch()
   const [transactionsByEmployee, setTransactionsByEmployee] = useState<Transaction[] | null>(null)
 
   const fetchById = useCallback(
     async (employeeId: string) => {
-      const data = await fetchWithoutCache<Transaction[], RequestByEmployeeParams>(
+      const data = await fetchWithCache<Transaction[], RequestByEmployeeParams>(
         "transactionsByEmployee",
         {
           employeeId,
@@ -18,21 +18,22 @@ export function useTransactionsByEmployee(): TransactionsByEmployeeResult {
 
       setTransactionsByEmployee(data)
     },
-    [fetchWithoutCache]
+    [fetchWithCache]
   )
 
   const updateTransaction = useCallback((transactionId: string, approved: boolean) => {
-    setTransactionsByEmployee(
-      (prevTransactions) =>
-        prevTransactions?.map((transaction) =>
-          transaction.id === transactionId ? { ...transaction, approved } : transaction
-        ) ?? null
+    setTransactionsByEmployee((prevTransactions) => 
+      prevTransactions?.map((transaction) => 
+        transaction.id === transactionId ? { ...transaction, approved } : transaction
+      ) ?? null
     )
-  }, [])
+    clearCacheByEndpoint(["transactionsByEmployee"])
+  }, [clearCacheByEndpoint])
 
   const invalidateData = useCallback(() => {
     setTransactionsByEmployee(null)
-  }, [])
+    clearCacheByEndpoint(["transactionsByEmployee"])
+  }, [clearCacheByEndpoint])
 
   return { data: transactionsByEmployee, loading, fetchById, updateTransaction, invalidateData }
 }

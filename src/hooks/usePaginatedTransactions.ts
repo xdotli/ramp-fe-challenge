@@ -4,13 +4,13 @@ import { PaginatedTransactionsResult } from "./types"
 import { useCustomFetch } from "./useCustomFetch"
 
 export function usePaginatedTransactions(): PaginatedTransactionsResult {
-  const { fetchWithoutCache, loading } = useCustomFetch()
+  const { fetchWithCache, clearCacheByEndpoint, loading } = useCustomFetch()
   const [paginatedTransactions, setPaginatedTransactions] = useState<PaginatedResponse<
     Transaction[]
   > | null>(null)
 
   const fetchAll = useCallback(async () => {
-    const response = await fetchWithoutCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
+    const response = await fetchWithCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
       "paginatedTransactions",
       {
         page: paginatedTransactions === null ? 0 : paginatedTransactions.nextPage,
@@ -27,23 +27,25 @@ export function usePaginatedTransactions(): PaginatedTransactionsResult {
         nextPage: response.nextPage,
       }
     })
-  }, [fetchWithoutCache, paginatedTransactions])
+  }, [fetchWithCache, paginatedTransactions])
 
   const updateTransaction = useCallback((transactionId: string, approved: boolean) => {
     setPaginatedTransactions((prevPaginatedTransactions) => {
       if (!prevPaginatedTransactions) return null
       return {
         ...prevPaginatedTransactions,
-        data: prevPaginatedTransactions.data.map((transaction) =>
+        data: prevPaginatedTransactions.data.map((transaction) => 
           transaction.id === transactionId ? { ...transaction, approved } : transaction
-        ),
+        )
       }
     })
-  }, [])
+    clearCacheByEndpoint(["paginatedTransactions"])
+  }, [clearCacheByEndpoint])
 
   const invalidateData = useCallback(() => {
     setPaginatedTransactions(null)
-  }, [])
+    clearCacheByEndpoint(["paginatedTransactions"])
+  }, [clearCacheByEndpoint])
 
   return { data: paginatedTransactions, loading, fetchAll, updateTransaction, invalidateData }
 }
