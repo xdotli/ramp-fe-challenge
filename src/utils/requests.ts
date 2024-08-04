@@ -8,7 +8,7 @@ import {
 } from "./types"
 import mockData from "../mock-data.json"
 
-const TRANSACTIONS_PER_PAGE = 15
+const TRANSACTIONS_PER_PAGE = 5
 
 const data: { employees: Employee[]; transactions: Transaction[] } = {
   employees: mockData.employees,
