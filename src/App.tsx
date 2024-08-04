@@ -10,16 +10,8 @@ import { Employee } from "./utils/types"
 
 export function App() {
   const { data: employees, loading: employeesLoading, fetchAll: fetchAllEmployees } = useEmployees()
-  const {
-    data: paginatedTransactions,
-    loading: paginatedTransactionsLoading,
-    ...paginatedTransactionsUtils
-  } = usePaginatedTransactions()
-  const {
-    data: transactionsByEmployee,
-    loading: transactionsByEmployeeLoading,
-    ...transactionsByEmployeeUtils
-  } = useTransactionsByEmployee()
+  const { data: paginatedTransactions, ...paginatedTransactionsUtils } = usePaginatedTransactions()
+  const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isTransactionsLoading, setIsTransactionsLoading] = useState(false)
 
   const transactions = useMemo(
@@ -57,14 +49,6 @@ export function App() {
     }
   }, [employees, employeesLoading, fetchAllEmployees, loadAllTransactions])
 
-  const updateTransactionApproval = useCallback(
-    async (transactionId: string, newValue: boolean) => {
-      await paginatedTransactionsUtils.updateTransaction(transactionId, newValue)
-      await transactionsByEmployeeUtils.updateTransaction(transactionId, newValue)
-    },
-    [paginatedTransactionsUtils, transactionsByEmployeeUtils]
-  )
-
   return (
     <Fragment>
       <main className="MainContainer">
@@ -98,13 +82,7 @@ export function App() {
         <div className="RampBreak--l" />
 
         <div className="RampGrid">
-          <Transactions
-            transactions={transactions}
-            loading={
-              isTransactionsLoading || paginatedTransactionsLoading || transactionsByEmployeeLoading
-            }
-            onApprove={updateTransactionApproval}
-          />
+          <Transactions transactions={transactions} />
 
           {transactions !== null && paginatedTransactions?.nextPage && (
             <button
